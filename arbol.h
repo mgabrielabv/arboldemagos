@@ -29,9 +29,6 @@ struct Mago {
              es_dueno(false), num_hechizos(0), izquierdo(nullptr), derecho(nullptr) {}
 };
 class ArbolMagico {
-    Mago* buscar_mago_por_id_publico(int id) const;
-    Mago* buscar_mago_por_nombre_publico(const string& nombre, const string& apellido) const;
-    void liberar_arbol_publico();
 
 public:
     ArbolMagico();

@@ -53,19 +53,14 @@ void ArbolMagico::liberar_arbol(Mago* nodo) {
 Mago* ArbolMagico::insertar_mago(Mago* nodo, Mago* nuevo) {
     if (!nodo) return nuevo;
 
-    if (nuevo->id_padre < nodo->id) {
+    if (nuevo->id < nodo->id) {
         nodo->izquierdo = insertar_mago(nodo->izquierdo, nuevo);
-    } else if (nuevo->id_padre > nodo->id) {
+    } else if (nuevo->id > nodo->id) {
         nodo->derecho = insertar_mago(nodo->derecho, nuevo);
     } else {
-        // discipulo
-        if (!nodo->izquierdo) {
-            nodo->izquierdo = nuevo;
-        } else if (!nodo->derecho) {
-            nodo->derecho = nuevo;
-        }
+        // Si el id ya existe, no lo inserta de nuevo
+        return nodo;
     }
-    
     return nodo;
 }
 
@@ -244,7 +239,7 @@ void ArbolMagico::cargar_desde_csv() {
 
     while (getline(archivo, linea)) {
         Mago* nuevo = crear_mago_desde_linea(linea);
-        if (!raiz && nuevo->id_padre == 0) {
+        if (!raiz) {
             raiz = nuevo;
         } else {
             insertar_mago(raiz, nuevo);
