@@ -1,9 +1,9 @@
 
 #ifndef Arbol_h
 #define Arbol_h
-
 #include <fstream>
 #include <string>
+#include <iostream>
 using namespace std;
 
 struct hechizo {
@@ -29,10 +29,16 @@ struct Mago {
              es_dueno(false), num_hechizos(0), izquierdo(nullptr), derecho(nullptr) {}
 };
 class ArbolMagico {
+    Mago* buscar_mago_por_id_publico(int id) const;
+    Mago* buscar_mago_por_nombre_publico(const string& nombre, const string& apellido) const;
+    void liberar_arbol_publico();
+
 public:
     ArbolMagico();
     ~ArbolMagico();
-    
+    Mago* buscar_mago_por_id_publico(int id) const;
+    Mago* buscar_mago_por_nombre_publico(const string& nombre, const string& apellido) const;
+    void liberar_arbol_publico();
 
     Mago* crear_mago_desde_linea(const string& linea);
     void liberar_arbol(Mago* nodo);
@@ -53,6 +59,10 @@ public:
     void guardar_a_csv() const;
 
     void mostrar_linea_sucesion() const;
+    void mostrar_arbol() const;
+    void mostrar_arbol_rec(Mago* nodo, int nivel) const;
+    void modificar_mago(int id_mago, const Mago& datos);
+    Mago* obtener_dueno_actual() const;
     
     Mago* get_raiz() const { return raiz; }
 

@@ -219,11 +219,11 @@ Mago* ArbolMagico::buscar_dueno_recursivo(Mago* nodo) const {
 void ArbolMagico::mostrar_linea_sucesion() const {
     Mago* dueno = buscar_dueno_recursivo(raiz);
     if (!dueno) {
-        cout << "No hay dueño actual del hechizo.\n";
+        cout << "No hay dueno actual del hechizo.\n";
         return;
     }
     cout << "\nLINEA DE SUCESION ACTUAL\n";
-    cout << "1. " << dueno->nombre << " " << dueno->apellido << " (Actual dueño)\n";
+    cout << "1. " << dueno->nombre << " " << dueno->apellido << " (Actual dueno)\n";
     Mago* sucesor = encontrar_sucesor(dueno);
     int pos = 2;
     while (sucesor) {
@@ -251,4 +251,87 @@ void ArbolMagico::cargar_desde_csv() {
         }
     }
     archivo.close();
+}
+void ArbolMagico::guardar_a_csv() const {
+    ofstream archivo_m(archivo_magos);
+    if (!archivo_m.is_open()) return;
+    archivo_m << "id,nombre,apellido,genero,edad,id_padre,esta_muerto,tipo_magia,es_dueno\n";
+    guardar_magos_recursivo(raiz, archivo_m);
+}
+
+void ArbolMagico::guardar_magos_recursivo(Mago* nodo, std::ofstream& archivo_m) const {
+    if (!nodo) return;
+    guardar_magos_recursivo(nodo->izquierdo, archivo_m);
+    archivo_m << nodo->id << "," 
+             << nodo->nombre << "," 
+             << nodo->apellido << "," 
+             << nodo->genero << "," 
+             << nodo->edad << "," 
+             << nodo->id_padre << "," 
+             << (nodo->esta_muerto ? "1" : "0") << "," 
+             << nodo->tipo_magia << "," 
+             << (nodo->es_dueno ? "1" : "0") << "\n";
+    guardar_magos_recursivo(nodo->derecho, archivo_m);
+}
+
+void ArbolMagico::mostrar_arbol() const {
+    cout << "\n=== ARBOL DE MAGOS ===\n";
+    mostrar_arbol_rec(raiz, 0);
+}
+
+void ArbolMagico::mostrar_arbol_rec(Mago* nodo, int nivel) const {
+    if (!nodo) return;
+    mostrar_arbol_rec(nodo->derecho, nivel + 1);
+    for (int i = 0; i < nivel; ++i) cout << "    ";
+    cout << nodo->nombre << " " << nodo->apellido << " (ID:" << nodo->id;
+    if (nodo->es_dueno) cout << ", DUENO";
+    cout << ")" << endl;
+    mostrar_arbol_rec(nodo->izquierdo, nivel + 1);
+}
+
+void ArbolMagico::modificar_mago(int id_mago, const Mago& datos) {
+    Mago* mago = buscar_mago_por_id(raiz, id_mago);
+    if (!mago) {
+        cout << "Mago no encontrado.\n";
+        return;
+    }
+    cout << "\nEditando mago: " << mago->nombre << " " << mago->apellido << "\n";
+    cout << "1. Nombre\n2. Apellido\n3. Genero\n4. Edad\n5. Estado\n6. Tipo de magia\n";
+    cout << "Seleccione campo a editar: ";
+    int opcion;
+    cin >> opcion;
+    cin.ignore();
+    switch (opcion) {
+        case 1:
+            cout << "Nuevo nombre: ";
+            getline(cin, mago->nombre);
+            break;
+        case 2:
+            cout << "Nuevo apellido: ";
+            getline(cin, mago->apellido);
+            break;
+        case 3:
+            cout << "Nuevo genero (H/M): ";
+            cin >> mago->genero;
+            break;
+        case 4:
+            cout << "Nueva edad: ";
+            cin >> mago->edad;
+            break;
+        case 5:
+            cout << "Esta muerto? (1=Si, 0=No): ";
+            cin >> mago->esta_muerto;
+            break;
+        case 6:
+            cout << "Nuevo tipo de magia (elemental/unique/mixed/no_magic): ";
+            getline(cin, mago->tipo_magia);
+            break;
+        default:
+            cout << "Opcion no valida.\n";
+    }
+    guardar_a_csv();
+}
+
+Mago* ArbolMagico::obtener_dueno_actual() const {
+    return buscar_dueno_recursivo(raiz);
 }
