@@ -1,3 +1,4 @@
+
 #ifndef Arbol_h
 #define Arbol_h
 
@@ -31,6 +32,7 @@ class ArbolMagico {
 public:
     ArbolMagico();
     ~ArbolMagico();
+    
 
     Mago* crear_mago_desde_linea(const string& linea);
     void liberar_arbol(Mago* nodo);
