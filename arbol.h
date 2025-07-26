@@ -59,6 +59,11 @@ private:
     string archivo_magos;
     string archivo_hechizos;
 
+    void parsear_linea_hechizo(const string& linea, int& id_mago, hechizo& hechizo);
+    void guardar_hechizos_recursivo(Mago* nodo, std::ofstream& archivo) const;
+    void guardar_magos_recursivo(Mago* nodo, std::ofstream& archivo_m) const;
+    Mago* buscar_dueno_recursivo(Mago* nodo) const;
 };
+
 #endif
 

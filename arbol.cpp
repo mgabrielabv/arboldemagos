@@ -68,3 +68,28 @@ Mago* ArbolMagico::insertar_mago(Mago* nodo, Mago* nuevo) {
     
     return nodo;
 }
+
+Mago* ArbolMagico::buscar_mago_por_id(Mago* nodo, int id) const {
+    if (!nodo) return nullptr;
+    if (id == nodo->id) return nodo;
+    if (id < nodo->id) return buscar_mago_por_id(nodo->izquierdo, id);
+    return buscar_mago_por_id(nodo->derecho, id);
+}
+
+Mago* ArbolMagico::buscar_padre(Mago* nodo, int id_padre) const {
+    if (!nodo) return nullptr;
+    if (nodo->id == id_padre) return nodo;
+    
+    Mago* encontrado = buscar_padre(nodo->izquierdo, id_padre);
+    if (encontrado) return encontrado;
+    return buscar_padre(nodo->derecho, id_padre);
+}
+
+Mago* ArbolMagico::buscar_mago_por_nombre(Mago* nodo, const string& nombre, const string& apellido) const {
+    if (!nodo) return nullptr;
+    if (nodo->nombre == nombre && nodo->apellido == apellido) return nodo;
+    
+    Mago* encontrado = buscar_mago_por_nombre(nodo->izquierdo, nombre, apellido);
+    if (encontrado) return encontrado;
+    return buscar_mago_por_nombre(nodo->derecho, nombre, apellido);
+}
