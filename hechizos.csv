@@ -1,18 +1,46 @@
 id_mago,nombre_hechizo,poder
 1,Expelliarmus,50
 2,Avada Kedavra,100
-2,Avada Kedavra,100
-2,expelliarmus,70
 3,Lumos,20
 4,Expecto Patronum,80
-4,lebiosa,80
-4,muajaja,80
 5,Crucio,90
 6,Imperio,85
+7,Obliviate,60
 8,Incendio,40
 9,Protego,30
 10,Stupefy,70
 11,Accio,25
 12,Reducto,55
+13,Diffindo,35
 14,Reparo,15
 15,Silencio,45
+16,Finite Incantatem,65
+17,Confundo,50
+18,Confringo,75
+19,Descendo,20
+20,Engorgio,30
+21,Episkey,40
+22,Furnunculus,60
+23,Geminio,35
+24,Homenum Revelio,50
+25,Impedimenta,55
+26,Levicorpus,45
+27,Locomotor,25
+28,Morsmordre,95
+29,Muffliato,40
+30,Nox,10
+31,Obscuro,20
+32,Petrificus Totalus,70
+33,Point Me,15
+34,Portus,60
+35,Prior Incantato,50
+36,Relashio,35
+37,Rictusempra,30
+38,Scourgify,25
+39,Sectumsempra,90
+40,Serpensortia,55
+41,Sonorus,40
+42,Tarantallegra,35
+43,Wingardium Leviosa,60
+44,Aguamenti,30
+45,Arania Exumai,70

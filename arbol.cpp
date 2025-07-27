@@ -501,18 +501,16 @@ void ArbolMagico::cargar_hechizos_csv() {
 void ArbolMagico::guardar_a_csv() const {
     ofstream archivo_m(archivo_magos);
     if (!archivo_m.is_open()) {
-        cerr << "No se pudo abrir el archivo de magos para escritura\n";
+        cerr << "Error al abrir " << archivo_magos << endl;
         return;
     }
     archivo_m << "id,nombre,apellido,genero,edad,id_padre,esta_muerto,tipo_magia,es_dueno\n";
     guardar_magos_recursivo(raiz, archivo_m);
     archivo_m.close();
-
-    guardar_hechizos_csv();
 }
 
 void ArbolMagico::guardar_hechizos_csv() const {
-    ofstream archivo(archivo_hechizos, ios::out | ios::trunc); // Usamos trunc para evitar duplicados
+    ofstream archivo(archivo_hechizos, ios::out | ios::trunc);
     if (!archivo.is_open()) return;
     archivo << "id_mago,nombre_hechizo,poder\n";
     guardar_hechizos_recursivo(raiz, archivo);
@@ -522,9 +520,9 @@ void ArbolMagico::guardar_hechizos_csv() const {
 void ArbolMagico::guardar_hechizos_recursivo(Mago* nodo, ofstream& archivo) const {
     if (!nodo) return;
     for (int i = 0; i < nodo->num_hechizos; ++i) {
-        archivo << nodo->id << "," 
-               << nodo->hechizos[i].nombre << ","
-               << nodo->hechizos[i].poder << "\n";
+        archivo << nodo->id << ","
+                << nodo->hechizos[i].nombre << ","
+                << nodo->hechizos[i].poder << "\n";
     }
     guardar_hechizos_recursivo(nodo->izquierdo, archivo);
     guardar_hechizos_recursivo(nodo->derecho, archivo);
@@ -555,7 +553,7 @@ void ArbolMagico::reasignar_hechizo(int id_mago, const hechizo& hechizo) {
     }
     if (idx != -1) {
         for (int j = idx; j < dueno_actual->num_hechizos - 1; ++j) {
-            dueno_actual->hechizos[j] = dueno_actual->hechizos[j+1];
+            dueno_actual->hechizos[j] = dueno_actual->hechizos[j + 1];
         }
         dueno_actual->num_hechizos--;
     }
@@ -572,7 +570,7 @@ void ArbolMagico::reasignar_hechizo(int id_mago, const hechizo& hechizo) {
         nuevo_dueno->hechizos[nuevo_dueno->num_hechizos] = hechizo;
         nuevo_dueno->num_hechizos++;
     }
-    cout << "El nuevo dueño del hechizo es: " << nuevo_dueno->nombre << " " 
+    cout << "El nuevo dueño del hechizo es: " << nuevo_dueno->nombre << " "
          << nuevo_dueno->apellido << " (ID: " << nuevo_dueno->id << ")\n";
     guardar_a_csv();
 }
@@ -596,7 +594,10 @@ void ArbolMagico::mostrar_hechizos_mago(int id) const {
     }
 }
 
-void ArbolMagico::agregar_hechizo(int id_mago, const hechizo& hechizo) {
+void ArbolMagico::agregar_hechizo(int id_mago, const hechizo& nuevo_hechizo) {
+
+    cargar_hechizos_csv();
+
     Mago* mago = buscar_mago_por_id(raiz, id_mago);
     if (!mago) {
         cout << "Mago no encontrado.\n";
@@ -606,8 +607,11 @@ void ArbolMagico::agregar_hechizo(int id_mago, const hechizo& hechizo) {
         cout << "Este mago ya tiene el máximo de hechizos.\n";
         return;
     }
-    mago->hechizos[mago->num_hechizos] = hechizo;
+
+    mago->hechizos[mago->num_hechizos] = nuevo_hechizo;
     mago->num_hechizos++;
     cout << "Hechizo agregado con éxito.\n";
-    guardar_a_csv();
+
+    guardar_hechizos_csv();
+
 }
