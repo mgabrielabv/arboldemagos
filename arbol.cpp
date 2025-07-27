@@ -1,6 +1,7 @@
 #include "arbol.h"
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -50,6 +51,7 @@ void ArbolMagico::liberar_arbol(Mago* nodo) {
         delete nodo;
     }
 }
+
 Mago* ArbolMagico::insertar_mago(Mago* nodo, Mago* nuevo) {
     if (!nodo) return nuevo;
 
@@ -58,7 +60,6 @@ Mago* ArbolMagico::insertar_mago(Mago* nodo, Mago* nuevo) {
     } else if (nuevo->id > nodo->id) {
         nodo->derecho = insertar_mago(nodo->derecho, nuevo);
     } else {
-        // Si el id ya existe, no lo inserta de nuevo
         return nodo;
     }
     return nodo;
@@ -240,24 +241,55 @@ void ArbolMagico::cargar_desde_csv() {
     string linea;
     getline(archivo, linea); 
 
+    int capacidad = 100;
+    int total = 0;
+    Mago** magos = new Mago*[capacidad];
+
     while (getline(archivo, linea)) {
-        Mago* nuevo = crear_mago_desde_linea(linea);
-        if (!raiz) {
-            raiz = nuevo;
-        } else {
-            insertar_mago(raiz, nuevo);
+        if (total == capacidad) {
+            capacidad *= 2;
+            Mago** temp = new Mago*[capacidad];
+            for (int i = 0; i < total; ++i) temp[i] = magos[i];
+            delete[] magos;
+            magos = temp;
         }
+        magos[total++] = crear_mago_desde_linea(linea);
     }
     archivo.close();
-}
-void ArbolMagico::guardar_a_csv() const {
-    ofstream archivo_m(archivo_magos);
-    if (!archivo_m.is_open()) return;
-    archivo_m << "id,nombre,apellido,genero,edad,id_padre,esta_muerto,tipo_magia,es_dueno\n";
-    guardar_magos_recursivo(raiz, archivo_m);
+
+    for (int i = 0; i < total; ++i) {
+        Mago* padre = magos[i];
+
+        int hijos_count = 0;
+        Mago* hijos[10]; 
+        for (int j = 0; j < total; ++j) {
+            if (magos[j]->id_padre == padre->id) {
+                hijos[hijos_count++] = magos[j];
+            }
+        }
+ 
+        for (int a = 0; a < hijos_count - 1; ++a) {
+            for (int b = a + 1; b < hijos_count; ++b) {
+                if (hijos[a]->edad > hijos[b]->edad) {
+                    Mago* tmp = hijos[a];
+                    hijos[a] = hijos[b];
+                    hijos[b] = tmp;
+                }
+            }
+        }
+        for (int h = 0; h < hijos_count; ++h) {
+            if (h == 0) padre->izquierdo = hijos[h];
+            if (h > 0) hijos[h-1]->derecho = hijos[h];
+        }
+        if (padre->id_padre == 0) raiz = padre;
+    }
+
+    delete[] magos;
+
+    cargar_hechizos_csv();
 }
 
-void ArbolMagico::guardar_magos_recursivo(Mago* nodo, std::ofstream& archivo_m) const {
+void ArbolMagico::guardar_magos_recursivo(Mago* nodo, ofstream& archivo_m) const {
     if (!nodo) return;
     guardar_magos_recursivo(nodo->izquierdo, archivo_m);
     archivo_m << nodo->id << "," 
@@ -273,8 +305,23 @@ void ArbolMagico::guardar_magos_recursivo(Mago* nodo, std::ofstream& archivo_m) 
 }
 
 void ArbolMagico::mostrar_arbol() const {
-    cout << "\n=== ARBOL DE MAGOS ===\n";
-    mostrar_arbol_rec(raiz, 0);
+    mostrar_arbol_genealogico();
+    mostrar_arbol_balanceado();
+}
+
+void ArbolMagico::mostrar_arbol_genealogico() const {
+    cout << "\n=== ARBOL GENEALOGICO DE MAGOS ===\n";
+    mostrar_arbol_genealogico_rec(raiz, 0);
+}
+
+void ArbolMagico::mostrar_arbol_genealogico_rec(Mago* nodo, int nivel) const {
+    if (!nodo) return;
+    for (int i = 0; i < nivel; ++i) cout << "    ";
+    cout << nodo->nombre << " " << nodo->apellido << " (ID:" << nodo->id;
+    if (nodo->es_dueno) cout << ", DUENO";
+    cout << ")" << endl;
+    mostrar_arbol_genealogico_rec(nodo->izquierdo, nivel + 1); 
+    mostrar_arbol_genealogico_rec(nodo->derecho, nivel); 
 }
 
 void ArbolMagico::mostrar_arbol_rec(Mago* nodo, int nivel) const {
@@ -285,6 +332,52 @@ void ArbolMagico::mostrar_arbol_rec(Mago* nodo, int nivel) const {
     if (nodo->es_dueno) cout << ", DUENO";
     cout << ")" << endl;
     mostrar_arbol_rec(nodo->izquierdo, nivel + 1);
+}
+
+void ArbolMagico::mostrar_arbol_balanceado() const {
+    cout << "\n=== ARBOL BALANCEADO DE MAGOS (POR EDAD) ===\n";
+    int total = contar_magos(raiz);
+    Mago** magos = new Mago*[total];
+    int idx = 0;
+    recolectar_magos(raiz, magos, idx);
+    ordenar_por_edad(magos, total);
+    Mago* balanceado = construir_balanceado(magos, 0, total - 1);
+    mostrar_arbol_rec(balanceado, 0);
+    delete[] magos;
+    ArbolMagico::liberar_arbol(balanceado);
+}
+
+int ArbolMagico::contar_magos(Mago* nodo) const {
+    if (!nodo) return 0;
+    return 1 + contar_magos(nodo->izquierdo) + contar_magos(nodo->derecho);
+}
+
+void ArbolMagico::recolectar_magos(Mago* nodo, Mago** magos, int& idx) const {
+    if (!nodo) return;
+    magos[idx++] = nodo;
+    recolectar_magos(nodo->izquierdo, magos, idx);
+    recolectar_magos(nodo->derecho, magos, idx);
+}
+
+void ArbolMagico::ordenar_por_edad(Mago** magos, int total) const {
+    for (int i = 0; i < total - 1; ++i) {
+        for (int j = i + 1; j < total; ++j) {
+            if (magos[i]->edad > magos[j]->edad) {
+                Mago* tmp = magos[i];
+                magos[i] = magos[j];
+                magos[j] = tmp;
+            }
+        }
+    }
+}
+
+Mago* ArbolMagico::construir_balanceado(Mago** magos, int inicio, int fin) const {
+    if (inicio > fin) return nullptr;
+    int mid = (inicio + fin) / 2;
+    Mago* nuevo = new Mago(*magos[mid]);
+    nuevo->izquierdo = construir_balanceado(magos, inicio, mid - 1);
+    nuevo->derecho = construir_balanceado(magos, mid + 1, fin);
+    return nuevo;
 }
 
 void ArbolMagico::modificar_mago(int id_mago, const Mago& datos) {
@@ -300,30 +393,39 @@ void ArbolMagico::modificar_mago(int id_mago, const Mago& datos) {
     cin >> opcion;
     cin.ignore();
     switch (opcion) {
-        case 1:
+        case 1: {
             cout << "Nuevo nombre: ";
             getline(cin, mago->nombre);
             break;
-        case 2:
+        }
+        case 2: {
             cout << "Nuevo apellido: ";
             getline(cin, mago->apellido);
             break;
-        case 3:
+        }
+        case 3: {
             cout << "Nuevo genero (H/M): ";
             cin >> mago->genero;
+            cin.ignore();
             break;
-        case 4:
+        }
+        case 4: {
             cout << "Nueva edad: ";
             cin >> mago->edad;
+            cin.ignore();
             break;
-        case 5:
+        }
+        case 5: {
             cout << "Esta muerto? (1=Si, 0=No): ";
             cin >> mago->esta_muerto;
+            cin.ignore();
             break;
-        case 6:
+        }
+        case 6: {
             cout << "Nuevo tipo de magia (elemental/unique/mixed/no_magic): ";
             getline(cin, mago->tipo_magia);
             break;
+        }
         default:
             cout << "Opcion no valida.\n";
     }
@@ -348,7 +450,6 @@ void ArbolMagico::parsear_linea_hechizo(const string& linea, int& id_mago, hechi
             token = linea.substr(start);
             start = linea.size();
         }
-
         switch (campo) {
             case 0:
                 if (!token.empty())
@@ -368,19 +469,26 @@ void ArbolMagico::parsear_linea_hechizo(const string& linea, int& id_mago, hechi
     }
 }
 
+void ArbolMagico::limpiar_hechizos_recursivo(Mago* nodo) {
+    if (!nodo) return;
+    nodo->num_hechizos = 0;
+    limpiar_hechizos_recursivo(nodo->izquierdo);
+    limpiar_hechizos_recursivo(nodo->derecho);
+}
+
 void ArbolMagico::cargar_hechizos_csv() {
     ifstream archivo(archivo_hechizos);
     if (!archivo.is_open()) return;
 
-    string linea;
-    std::getline(archivo, linea);
+    limpiar_hechizos_recursivo(raiz); 
 
-    while (std::getline(archivo, linea)) {
+    string linea;
+    getline(archivo, linea); 
+
+    while (getline(archivo, linea)) {
         int id_mago;
         hechizo nuevo_hechizo;
-        
         parsear_linea_hechizo(linea, id_mago, nuevo_hechizo);
-        
         Mago* mago = buscar_mago_por_id(raiz, id_mago);
         if (mago && mago->num_hechizos < 10) {
             mago->hechizos[mago->num_hechizos] = nuevo_hechizo;
@@ -388,17 +496,30 @@ void ArbolMagico::cargar_hechizos_csv() {
         }
     }
     archivo.close();
-    
+}
+
+void ArbolMagico::guardar_a_csv() const {
+    ofstream archivo_m(archivo_magos);
+    if (!archivo_m.is_open()) {
+        cerr << "No se pudo abrir el archivo de magos para escritura\n";
+        return;
+    }
+    archivo_m << "id,nombre,apellido,genero,edad,id_padre,esta_muerto,tipo_magia,es_dueno\n";
+    guardar_magos_recursivo(raiz, archivo_m);
+    archivo_m.close();
+
+    guardar_hechizos_csv();
 }
 
 void ArbolMagico::guardar_hechizos_csv() const {
-    ofstream archivo(archivo_hechizos, ios::app);
+    ofstream archivo(archivo_hechizos, ios::out | ios::trunc); // Usamos trunc para evitar duplicados
     if (!archivo.is_open()) return;
-    
+    archivo << "id_mago,nombre_hechizo,poder\n";
     guardar_hechizos_recursivo(raiz, archivo);
+    archivo.close();
 }
 
-void ArbolMagico::guardar_hechizos_recursivo(Mago* nodo, std::ofstream& archivo) const {
+void ArbolMagico::guardar_hechizos_recursivo(Mago* nodo, ofstream& archivo) const {
     if (!nodo) return;
     for (int i = 0; i < nodo->num_hechizos; ++i) {
         archivo << nodo->id << "," 
@@ -415,21 +536,39 @@ void ArbolMagico::reasignar_hechizo(int id_mago, const hechizo& hechizo) {
         cout << "No hay dueño actual del hechizo.\n";
         return;
     }
-    
     if (!dueno_actual->esta_muerto && dueno_actual->edad <= 70) {
         cout << "El dueño actual sigue siendo válido.\n";
         return;
     }
-    
     Mago* nuevo_dueno = encontrar_sucesor(dueno_actual);
     if (!nuevo_dueno) {
         cout << "No se pudo encontrar un sucesor adecuado.\n";
         return;
     }
-    
+
+    int idx = -1;
+    for (int i = 0; i < dueno_actual->num_hechizos; ++i) {
+        if (dueno_actual->hechizos[i].nombre == hechizo.nombre && dueno_actual->hechizos[i].poder == hechizo.poder) {
+            idx = i;
+            break;
+        }
+    }
+    if (idx != -1) {
+        for (int j = idx; j < dueno_actual->num_hechizos - 1; ++j) {
+            dueno_actual->hechizos[j] = dueno_actual->hechizos[j+1];
+        }
+        dueno_actual->num_hechizos--;
+    }
     dueno_actual->es_dueno = false;
     nuevo_dueno->es_dueno = true;
-    if (nuevo_dueno->num_hechizos < 10) {
+    bool ya_tiene = false;
+    for (int i = 0; i < nuevo_dueno->num_hechizos; ++i) {
+        if (nuevo_dueno->hechizos[i].nombre == hechizo.nombre && nuevo_dueno->hechizos[i].poder == hechizo.poder) {
+            ya_tiene = true;
+            break;
+        }
+    }
+    if (!ya_tiene && nuevo_dueno->num_hechizos < 10) {
         nuevo_dueno->hechizos[nuevo_dueno->num_hechizos] = hechizo;
         nuevo_dueno->num_hechizos++;
     }

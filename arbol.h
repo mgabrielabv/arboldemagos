@@ -1,4 +1,3 @@
-
 #ifndef Arbol_h
 #define Arbol_h
 #include <fstream>
@@ -38,7 +37,7 @@ public:
     void liberar_arbol_publico();
 
     Mago* crear_mago_desde_linea(const string& linea);
-    void liberar_arbol(Mago* nodo);
+    static void liberar_arbol(Mago* nodo);
     Mago* insertar_mago(Mago* nodo, Mago* nuevo);
     Mago* buscar_mago_por_id(Mago* nodo, int id) const;
     Mago* buscar_padre(Mago* nodo, int id_padre) const;
@@ -65,6 +64,13 @@ public:
     Mago* obtener_dueno_actual() const;
     void agregar_hechizo(int id_mago, const hechizo& nuevo_hechizo);
     void reasignar_hechizo(int id_mago, const hechizo& hechizo);
+    void mostrar_arbol_genealogico() const;
+    void mostrar_arbol_balanceado() const;
+    void mostrar_arbol_genealogico_rec(Mago* nodo, int nivel) const;
+    int contar_magos(Mago* nodo) const;
+    void recolectar_magos(Mago* nodo, Mago** magos, int& idx) const;
+    void ordenar_por_edad(Mago** magos, int total) const;
+    Mago* construir_balanceado(Mago** magos, int inicio, int fin) const;
     
     Mago* get_raiz() const { return raiz; }
 
@@ -77,6 +83,7 @@ private:
     void guardar_hechizos_recursivo(Mago* nodo, std::ofstream& archivo) const;
     void guardar_magos_recursivo(Mago* nodo, std::ofstream& archivo_m) const;
     Mago* buscar_dueno_recursivo(Mago* nodo) const;
+    void limpiar_hechizos_recursivo(Mago* nodo);
 };
 
 #endif
