@@ -183,17 +183,60 @@ Mago* ArbolMagico::buscar_maestro(Mago* discipulo) const {
 Mago* ArbolMagico::encontrar_sucesor(Mago* actual) const {
     if (!actual) return nullptr;
 
+    // 1. Si el dueño actual tiene discípulos
+    if (actual->izquierdo || actual->derecho) {
+        // Buscar primero discípulo con magia elemental o unique
+        Mago* discipulo_magia = buscar_discipulo_magia(actual, "elemental", "unique");
+        if (discipulo_magia) return discipulo_magia;
+        
+        // Si no, buscar discípulo con magia mixed
+        Mago* discipulo_mixed = buscar_discipulo_mixed(actual);
+        if (discipulo_mixed) return discipulo_mixed;
+        
+        // Si no, primer hombre vivo encontrado
+        Mago* primer_hombre = buscar_primer_hombre_vivo(actual);
+        if (primer_hombre) return primer_hombre;
+    }
+
+    // 2. Si el dueño murió y no tiene discípulos
+    if (actual->is_dead && !actual->izquierdo && !actual->derecho) {
+        // Buscar compañero discípulo
+        Mago* companero = buscar_companero_discipulo(actual);
+        
+        if (companero && !companero->is_dead && 
+            (companero->type_magic == actual->type_magic || 
+             es_magia_compatible(companero->type_magic))) {
+            return companero;
+        }
+        
+        // Si el compañero tiene discípulos que cumplan las condiciones
+        if (companero) {
+            Mago* discipulo_companero = buscar_discipulo_magia(companero, "elemental", "unique");
+            if (!discipulo_companero) discipulo_companero = buscar_discipulo_mixed(companero);
+            if (discipulo_companero) return discipulo_companero;
+        }
+        
+        // 3. Si el compañero no está vivo o no tiene hijos
+        Mago* maestro = buscar_maestro(actual);
+        if (maestro) {
+            Mago* tio = buscar_companero_discipulo(maestro);
+            if (tio) return tio;
+        }
+    }
+
+    // 4. Si el dueño tiene más de 70 años
     if (actual->age > 70) {
+        // Buscar discípulo con misma magia que el maestro
         Mago* discipulo_misma_magia = nullptr;
         Mago* discipulo_mayor_edad = nullptr;
-
+        
         if (actual->izquierdo && !actual->izquierdo->is_dead) {
             if (actual->izquierdo->type_magic == actual->type_magic) {
                 discipulo_misma_magia = actual->izquierdo;
             }
             discipulo_mayor_edad = actual->izquierdo;
         }
-
+        
         if (actual->derecho && !actual->derecho->is_dead) {
             if (actual->derecho->type_magic == actual->type_magic) {
                 if (!discipulo_misma_magia || actual->derecho->age > discipulo_misma_magia->age) {
@@ -206,39 +249,55 @@ Mago* ArbolMagico::encontrar_sucesor(Mago* actual) const {
         }
         
         if (discipulo_misma_magia) return discipulo_misma_magia;
-        return discipulo_mayor_edad;
+        if (discipulo_mayor_edad) return discipulo_mayor_edad;
     }
-    
-    Mago* sucesor = buscar_discipulo_magia(actual, "elemental", "unique");
-    if (sucesor) return sucesor;
-    
-    sucesor = buscar_discipulo_mixed(actual);
-    if (sucesor) return sucesor;
-    
-    sucesor = buscar_primer_hombre_vivo(actual);
-    if (sucesor) return sucesor;
-   
-    Mago* companero = buscar_companero_discipulo(actual);
-    if (companero && es_magia_compatible(companero->type_magic)) {
-        return companero;
-    }
-    
-    if (companero) {
-        sucesor = buscar_discipulo_magia(companero, "elemental", "unique");
-        if (!sucesor) sucesor = buscar_discipulo_mixed(companero);
-        if (!sucesor) sucesor = buscar_primer_hombre_vivo(companero);
-        if (sucesor) return sucesor;
-    }
-    
-    Mago* maestro = buscar_maestro(actual);
-    if (maestro && !maestro->is_dead) {
-        Mago* tio = buscar_companero_discipulo(maestro);
-        if (tio) return tio;
-    }
-    
+
+    // 5. Buscar mujer más joven con discípulos vivos y maestros mixed
+    Mago* mejor_mujer_con_discipulos = nullptr;
     Mago* mejor_mujer = nullptr;
-    mejor_mujer = encontrar_mujer_mas_joven(raiz, mejor_mujer);
+    
+    // Usamos recursión en lugar de stack
+    encontrar_mejor_mujer_recursivo(raiz, mejor_mujer_con_discipulos, mejor_mujer, actual);
+    
+    if (mejor_mujer_con_discipulos) return mejor_mujer_con_discipulos;
     return mejor_mujer;
+}
+
+// Función auxiliar recursiva para encontrar la mejor mujer
+void ArbolMagico::encontrar_mejor_mujer_recursivo(Mago* nodo, Mago*& mejor_con_discipulos, 
+                                                 Mago*& mejor_mujer, Mago* actual) const {
+    if (!nodo) return;
+    
+    // Procesar hijos primero
+    encontrar_mejor_mujer_recursivo(nodo->izquierdo, mejor_con_discipulos, mejor_mujer, actual);
+    encontrar_mejor_mujer_recursivo(nodo->derecho, mejor_con_discipulos, mejor_mujer, actual);
+    
+    // Verificar si es mujer viva y no es el dueño actual
+    if (!nodo->is_dead && nodo->gender == 'M' && nodo->id != actual->id) {
+        // Verificar si tiene discípulos vivos
+        bool tiene_discipulos_vivos = (nodo->izquierdo && !nodo->izquierdo->is_dead) || 
+                                     (nodo->derecho && !nodo->derecho->is_dead);
+        
+        // Verificar si sus maestros fueron poseedores del hechizo y tenían magia mixed
+        bool maestro_cumple = false;
+        Mago* maestro = buscar_maestro(nodo);
+        if (maestro && maestro->type_magic == "mixed") {
+            // Verificar si el maestro fue poseedor del hechizo
+            // (asumimos que hay un historial de poseedores)
+            maestro_cumple = true; // Simplificación
+        }
+        
+        if (tiene_discipulos_vivos && maestro_cumple) {
+            if (!mejor_con_discipulos || nodo->age < mejor_con_discipulos->age) {
+                mejor_con_discipulos = nodo;
+            }
+        }
+        
+        // Guardar la mujer más joven en general
+        if (!mejor_mujer || nodo->age < mejor_mujer->age) {
+            mejor_mujer = nodo;
+        }
+    }
 }
 
 Mago* ArbolMagico::buscar_dueno_recursivo(Mago* nodo) const {

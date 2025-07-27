@@ -91,6 +91,8 @@ private:
     void recolectar_magos(Mago* nodo, Mago** magos, int& idx) const;
     void ordenar_por_edad(Mago** magos, int total) const;
     Mago* construir_balanceado(Mago** magos, int inicio, int fin) const;
+    void encontrar_mejor_mujer_recursivo(Mago* nodo, Mago*& mejor_con_discipulos, 
+                                       Mago*& mejor_mujer, Mago* actual) const;
 };
 
 #endif
