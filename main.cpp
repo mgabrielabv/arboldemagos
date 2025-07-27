@@ -4,7 +4,9 @@ using namespace std;
 
 int main() {
     ArbolMagico arbol;
+
     arbol.cargar_desde_csv();
+    arbol.cargar_hechizos_csv();
 
     cout << "\n--- Prueba buscar_mago_por_id ---\n";
     int id_prueba = 1;
@@ -36,10 +38,6 @@ int main() {
     cin.ignore();
     arbol.modificar_mago(id_mod, Mago());
 
-    cout << "\n--- Prueba guardar_a_csv ---\n";
-    arbol.guardar_a_csv();
-    cout << "Archivo CSV guardado.\n";
-
     cout << "\n--- Prueba obtener_dueno_actual ---\n";
     Mago* dueno = arbol.obtener_dueno_actual();
     if (dueno) {
@@ -48,6 +46,51 @@ int main() {
         cout << "No hay dueno actual." << endl;
     }
 
+    cout << "\n--- Prueba mostrar_hechizos_mago ---\n";
+    cout << "Ingrese el id de un mago para ver sus hechizos: ";
+    int id_hech;
+    cin >> id_hech;
+    arbol.mostrar_hechizos_mago(id_hech);
+
+    
+cout << "\n--- Prueba agregar_hechizo ---\n";
+cout << "Ingrese el id de un mago para agregarle un hechizo: ";
+int id_agregar;
+cin >> id_agregar;
+cin.ignore();
+
+hechizo nuevo_hechizo;
+cout << "Nombre del hechizo: ";
+getline(cin, nuevo_hechizo.nombre);
+cout << "Poder del hechizo: ";
+cin >> nuevo_hechizo.poder;
+cin.ignore();
+
+arbol.agregar_hechizo(id_agregar, nuevo_hechizo);
+cout << "Hechizo agregado.\n";
+
+    cout << "\n--- Prueba reasignar_hechizo ---\n";
+    cout << "Ingrese el id del mago para reasignar un hechizo: ";
+    int id_reasignar;
+    cin >> id_reasignar;
+    cin.ignore();
+
+    hechizo hechizo_reasignar;
+    cout << "Nombre del hechizo a reasignar: ";
+    getline(cin, hechizo_reasignar.nombre);
+    cout << "Poder del hechizo a reasignar: ";
+    cin >> hechizo_reasignar.poder;
+
+    arbol.reasignar_hechizo(id_reasignar, hechizo_reasignar);
+
+arbol.mostrar_hechizos_mago(id_agregar);
+
+    cout << "\n--- Guardando magos y hechizos en CSV ---\n";
+    arbol.guardar_a_csv();
+    arbol.guardar_hechizos_csv();
+    cout << "Archivos CSV guardados.\n";
+
     arbol.liberar_arbol(arbol.get_raiz());
+    cout << "Arbol liberado.\n";
     return 0;
 }

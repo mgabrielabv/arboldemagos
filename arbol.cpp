@@ -221,8 +221,11 @@ void ArbolMagico::mostrar_linea_sucesion() const {
     cout << "1. " << dueno->nombre << " " << dueno->apellido << " (Actual dueno)\n";
     Mago* sucesor = encontrar_sucesor(dueno);
     int pos = 2;
+    int ultimo_id = dueno->id;
     while (sucesor) {
         cout << pos++ << ". " << sucesor->nombre << " " << sucesor->apellido << "\n";
+        if (sucesor->id == ultimo_id) break;
+        ultimo_id = sucesor->id;
         sucesor = encontrar_sucesor(sucesor);
     }
 }
@@ -336,7 +339,6 @@ void ArbolMagico::parsear_linea_hechizo(const string& linea, int& id_mago, hechi
     size_t start = 0;
     int campo = 0;
 
-
     while ((pos = linea.find(',', start)) != string::npos || start < linea.size()) {
         string token;
         if (pos != string::npos) {
@@ -348,10 +350,19 @@ void ArbolMagico::parsear_linea_hechizo(const string& linea, int& id_mago, hechi
         }
 
         switch (campo) {
-            case 0: id_mago = stoi(token); break;
-            case 1: hechizo.nombre = token; break;
-            case 2: hechizo.poder = stoi(token); break;
-            default: break;
+            case 0:
+                if (!token.empty())
+                    id_mago = stoi(token);
+                break;
+            case 1:
+                hechizo.nombre = token;
+                break;
+            case 2:
+                if (!token.empty())
+                    hechizo.poder = stoi(token);
+                break;
+            default:
+                break;
         }
         campo++;
     }
@@ -362,7 +373,7 @@ void ArbolMagico::cargar_hechizos_csv() {
     if (!archivo.is_open()) return;
 
     string linea;
-    std::getline(archivo, linea); // Cabecera
+    std::getline(archivo, linea);
 
     while (std::getline(archivo, linea)) {
         int id_mago;
@@ -381,10 +392,8 @@ void ArbolMagico::cargar_hechizos_csv() {
 }
 
 void ArbolMagico::guardar_hechizos_csv() const {
-    ofstream archivo(archivo_hechizos);
+    ofstream archivo(archivo_hechizos, ios::app);
     if (!archivo.is_open()) return;
-    
-    archivo << "id_mago,nombre_hechizo,poder\n";
     
     guardar_hechizos_recursivo(raiz, archivo);
 }
@@ -462,16 +471,4 @@ void ArbolMagico::agregar_hechizo(int id_mago, const hechizo& hechizo) {
     mago->num_hechizos++;
     cout << "Hechizo agregado con éxito.\n";
     guardar_a_csv();
-}
-
-Mago* ArbolMagico::obtener_dueno_actual() const {
-    return buscar_dueno_recursivo(raiz);
-}
-
-Mago* ArbolMagico::buscar_dueno_recursivo(Mago* nodo) const {
-    if (!nodo) return nullptr;
-    if (nodo->es_dueno) return nodo;
-    Mago* encontrado = buscar_dueno_recursivo(nodo->izquierdo);
-    if (encontrado) return encontrado;
-    return buscar_dueno_recursivo(nodo->derecho);
 }

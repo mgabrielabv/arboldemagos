@@ -1,7 +1,7 @@
 id,nombre,apellido,genero,edad,id_padre,esta_muerto,tipo_magia,es_dueno
-1,Merlin,Gales,H,96,0,0,unique,1
+1,Merlin,Gales,H,56,0,1,elemental,1
 2,Morgana,Derdes,M,94,1,0,elemental,0
-3,Radleigh,Radleigh,H,68,1,0,elemental,0
+3,rodolfo,Radleigh,H,68,1,0,elemental,1
 4,harry,Haylock,M,66,2,0,mixed,0
 5,Vernham,Vernham,M,37,2,0,mixed,0
 6,Joiner,Joiner,M,62,3,0,unique,0
