@@ -54,12 +54,17 @@ public:
 
     void cargar_desde_csv();
     void guardar_a_csv() const;
+    void cargar_hechizos_csv();
+    void guardar_hechizos_csv() const;
 
     void mostrar_linea_sucesion() const;
     void mostrar_arbol() const;
+    void mostrar_hechizos_mago(int id) const;
     void mostrar_arbol_rec(Mago* nodo, int nivel) const;
     void modificar_mago(int id_mago, const Mago& datos);
     Mago* obtener_dueno_actual() const;
+    void agregar_hechizo(int id_mago, const hechizo& nuevo_hechizo);
+    void reasignar_hechizo(int id_mago, const hechizo& hechizo);
     
     Mago* get_raiz() const { return raiz; }
 
@@ -67,7 +72,7 @@ private:
     Mago* raiz;
     string archivo_magos;
     string archivo_hechizos;
-
+    
     void parsear_linea_hechizo(const string& linea, int& id_mago, hechizo& hechizo);
     void guardar_hechizos_recursivo(Mago* nodo, std::ofstream& archivo) const;
     void guardar_magos_recursivo(Mago* nodo, std::ofstream& archivo_m) const;
