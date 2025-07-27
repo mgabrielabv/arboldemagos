@@ -14,7 +14,7 @@ id,name,last_name,gender,age,id_father,is_dead,type_magic,is_owner
 13,Seyfart,Seyfart,M,8,6,0,no_magic,0
 14,Fincken,Fincken,H,21,7,0,elemental,0
 15,Aldersea,Aldersea,M,80,7,0,no_magic,0
-16,Toye,Toye,M,1,8,0,elemental,0
+16,Toye,toye,M,1,8,0,elemental,0
 17,Wanne,Wanne,H,1,8,0,no_magic,0
 18,Embleton,Embleton,H,1,9,0,unique,0
 19,Crinkley,Crinkley,M,1,9,0,no_magic,0
