@@ -12,8 +12,8 @@ void mostrarMenu() {
     cout << "4. Mostrar hechizos de un mago" << endl;
     cout << "5. Agregar hechizo a un mago" << endl;
     cout << "6. Modificar datos de un mago" << endl;
-    cout << "7. Simular muerte del dueño actual" << endl;
-    cout << "8. Mostrar dueño actual" << endl;
+    cout << "7. Simular muerte del dueno actual" << endl;
+    cout << "8. Mostrar dueno actual" << endl;
     cout << "9. Salir" << endl;
     cout << "Seleccione una opcion: ";
 }
@@ -40,7 +40,7 @@ int main() {
         
         Mago* dueno = arbol.obtener_dueno_actual();
         if (dueno) {
-            cout << "\nDueño actual del hechizo: " << dueno->name << " " << dueno->last_name 
+            cout << "\nDueno actual del hechizo: " << dueno->name << " " << dueno->last_name 
                  << " (ID: " << dueno->id << ")" << endl;
         }
         
@@ -139,12 +139,12 @@ int main() {
                     case 7: {
                         Mago* dueno = arbol.obtener_dueno_actual();
                         if (!dueno) {
-                            cout << "No hay dueño actual." << endl;
+                        cout << "No hay dueno actual." << endl;
                             pausa();
                             break;
                         }
                         
-                        cout << "Simulando muerte del dueño actual: " 
+                        cout << "Simulando muerte del dueno actual: " 
                              << dueno->name << " " << dueno->last_name << endl;
                              
                         Mago datos = *dueno;
@@ -157,20 +157,20 @@ int main() {
                             arbol.reasignar_hechizo(dueno->id, dueno->hechizos[i]);
                         }
                         
-                        cout << "Hechizos reasignados al nuevo dueño." << endl;
+                        cout << "Hechizos reasignados al nuevo dueno." << endl;
                         pausa();
                         break;
                     }
                     case 8: {
                         Mago* dueno = arbol.obtener_dueno_actual();
                         if (dueno) {
-                            cout << "\nDueño actual del hechizo: " << dueno->name << " " << dueno->last_name 
-                                 << " (ID: " << dueno->id << ")" << endl;
+                        cout << "\nDueno actual del hechizo: " << dueno->name << " " << dueno->last_name 
+                             << " (ID: " << dueno->id << ")" << endl;
                             cout << "Edad: " << dueno->age << endl;
                             cout << "Tipo de magia: " << dueno->type_magic << endl;
                             cout << "Hechizos: " << dueno->num_hechizos << endl;
                         } else {
-                            cout << "No hay dueño actual del hechizo." << endl;
+                            cout << "No hay dueno actual del hechizo." << endl;
                         }
                         pausa();
                         break;

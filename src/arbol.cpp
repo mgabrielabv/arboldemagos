@@ -351,7 +351,7 @@ void ArbolMagico::mostrar_linea_sucesion() const {
     };
     while (actual && !id_ya_mostrado(actual->id)) {
         cout << pos << ". " << actual->name << " " << actual->last_name;
-        if (pos == 1) cout << " (Actual dueno)";
+        if (pos == 1) cout << " (Actual dueño)";
         cout << "\n";
         ids_mostrados[ids_count++] = actual->id;
         actual = encontrar_sucesor(actual);
@@ -436,21 +436,9 @@ void ArbolMagico::mostrar_arbol_genealogico() const {
 
 void ArbolMagico::mostrar_arbol_genealogico_rec(Mago* nodo, int nivel) const {
     if (!nodo) return;
-    static const char* branch[] = {"", "├── ", "└── ", "│   ", "    "};
-    static string prefix = "";
-    cout << prefix;
-    cout << (nivel == 0 ? "" : (nodo->derecho ? branch[1] : branch[2]));
-    cout << nodo->name << " " << nodo->last_name << " (ID:" << nodo->id;
-    if (nodo->is_owner) cout << ", DUENO";
-    cout << ")" << endl;
-
-    string old_prefix = prefix;
-    if (nivel > 0) {
-        prefix += (nodo->derecho ? branch[3] : branch[4]);
-    }
-    mostrar_arbol_genealogico_rec(nodo->izquierdo, nivel + 1);
-    prefix = old_prefix;
-    mostrar_arbol_genealogico_rec(nodo->derecho, nivel + 1);
+    mostrar_arbol_genealogico_rec(nodo->izquierdo, 0);
+    cout << "ID: " << nodo->id << ", Padre: " << nodo->id_father << ", Nombre: " << nodo->name << " " << nodo->last_name << endl;
+    mostrar_arbol_genealogico_rec(nodo->derecho, 0);
 }
 
 void ArbolMagico::mostrar_arbol_rec(Mago* nodo, int nivel) const {
@@ -682,7 +670,7 @@ void ArbolMagico::reasignar_hechizo(int id_mago, const hechizo& hechizo) {
         nuevo_dueno->num_hechizos++;
     }
 
-    cout << "El nuevo dueño del hechizo es: " << nuevo_dueno->name << " "
+    cout << "El nuevo dueno del hechizo es: " << nuevo_dueno->name << " "
          << nuevo_dueno->last_name << " (ID: " << nuevo_dueno->id << ")\n";
 }
 

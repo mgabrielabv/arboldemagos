@@ -1,3 +1,4 @@
+
 #ifndef ARBOL_H
 #define ARBOL_H
 #define MAX_HIJOS 100  
@@ -37,6 +38,9 @@ struct Mago {
 
 class ArbolMagico {
 public:
+    // Muestra para cada mago sus hijos directos
+    void mostrar_padres_e_hijos() const;
+    void mostrar_padres_e_hijos_rec(Mago* nodo) const;
     ArbolMagico();
     ~ArbolMagico();
     

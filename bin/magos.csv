@@ -2,11 +2,11 @@ id,name,last_name,gender,age,id_father,is_dead,type_magic,is_owner
 1,marlon,galo,M,43,0,0 no,unique,0 no 
 2,Morgana,LeFay,M,94,1,1 si,elemental,0 no 
 3,Radleigh,Smith,H,68,1,0 no,elemental,0 no 
-4,Haylock,Granger,M,66,2,0 no,mixed,1 si 
+4,Haylock,Granger,M,66,2,1 si,mixed,0 no 
 5,Vernham,Dumbledore,M,37,2,0 no,mixed,0 no 
 6,Joiner,Weasley,M,61,3,1 si,elemental,0 no 
 7,Fieldgate,Potter,M,46,3,0 no,mixed,0 no 
-8,Borrington,Riddle,H,76,4,0 no,unique,0 no 
+8,Borrington,Riddle,H,76,4,0 no,unique,1 si 
 9,Vigours,Snape,H,72,4,0 no,elemental,0 no 
 10,Paolone,Lovegood,M,87,5,0 no,elemental,0 no 
 11,Casacchia,Longbottom,M,37,5,0 no,unique,0 no 
