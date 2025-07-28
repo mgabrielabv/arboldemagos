@@ -1,6 +1,7 @@
 id_mago,nombre_hechizo,poder
-1,Expelliarmus,50
-2,Avada Kedavra,100
+1,Avada Kedavra,100
+2,Expelliarmus,50
+2,muajaja,85
 3,Lumos,20
 4,Expecto Patronum,80
 5,Crucio,90
@@ -39,8 +40,3 @@ id_mago,nombre_hechizo,poder
 38,Scourgify,25
 39,Sectumsempra,90
 40,Serpensortia,55
-41,Sonorus,40
-42,Tarantallegra,35
-43,Wingardium Leviosa,60
-44,Aguamenti,30
-45,Arania Exumai,70

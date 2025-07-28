@@ -12,6 +12,36 @@ ArbolMagico::~ArbolMagico() {
     liberar_arbol(raiz);
 }
 
+Mago* ArbolMagico::buscar_discipulo_magia_por_padre(Mago* nodo, int id_padre, const string& magia1, const string& magia2) const {
+    if (!nodo) return nullptr;
+    if (!nodo->is_dead && nodo->id_father == id_padre && (nodo->type_magic == magia1 || nodo->type_magic == magia2)) {
+        return nodo;
+    }
+    Mago* encontrado = buscar_discipulo_magia_por_padre(nodo->izquierdo, id_padre, magia1, magia2);
+    if (encontrado) return encontrado;
+    return buscar_discipulo_magia_por_padre(nodo->derecho, id_padre, magia1, magia2);
+}
+
+Mago* ArbolMagico::buscar_discipulo_mixed_por_padre(Mago* nodo, int id_padre) const {
+    if (!nodo) return nullptr;
+    if (!nodo->is_dead && nodo->id_father == id_padre && nodo->type_magic == "mixed") {
+        return nodo;
+    }
+    Mago* encontrado = buscar_discipulo_mixed_por_padre(nodo->izquierdo, id_padre);
+    if (encontrado) return encontrado;
+    return buscar_discipulo_mixed_por_padre(nodo->derecho, id_padre);
+}
+
+Mago* ArbolMagico::buscar_primer_hombre_vivo_por_padre(Mago* nodo, int id_padre) const {
+    if (!nodo) return nullptr;
+    if (!nodo->is_dead && nodo->id_father == id_padre && nodo->gender == 'H') {
+        return nodo;
+    }
+    Mago* encontrado = buscar_primer_hombre_vivo_por_padre(nodo->izquierdo, id_padre);
+    if (encontrado) return encontrado;
+    return buscar_primer_hombre_vivo_por_padre(nodo->derecho, id_padre);
+}
+
 Mago* ArbolMagico::crear_mago_desde_linea(const string& linea) {
     Mago* nuevo = new Mago();
     size_t pos = 0;
@@ -183,24 +213,17 @@ Mago* ArbolMagico::buscar_maestro(Mago* discipulo) const {
 Mago* ArbolMagico::encontrar_sucesor(Mago* actual) const {
     if (!actual) return nullptr;
 
-    // 1. Si el dueño actual tiene discípulos
-    if (actual->izquierdo || actual->derecho) {
-        // Buscar primero discípulo con magia elemental o unique
-        Mago* discipulo_magia = buscar_discipulo_magia(actual, "elemental", "unique");
-        if (discipulo_magia) return discipulo_magia;
-        
-        // Si no, buscar discípulo con magia mixed
-        Mago* discipulo_mixed = buscar_discipulo_mixed(actual);
-        if (discipulo_mixed) return discipulo_mixed;
-        
-        // Si no, primer hombre vivo encontrado
-        Mago* primer_hombre = buscar_primer_hombre_vivo(actual);
-        if (primer_hombre) return primer_hombre;
-    }
+    Mago* discipulo_magia = buscar_discipulo_magia_por_padre(raiz, actual->id, "elemental", "unique");
+    if (discipulo_magia) return discipulo_magia;
 
-    // 2. Si el dueño murió y no tiene discípulos
+    Mago* discipulo_mixed = buscar_discipulo_mixed_por_padre(raiz, actual->id);
+    if (discipulo_mixed) return discipulo_mixed;
+
+    Mago* primer_hombre = buscar_primer_hombre_vivo_por_padre(raiz, actual->id);
+    if (primer_hombre) return primer_hombre;
+
     if (actual->is_dead && !actual->izquierdo && !actual->derecho) {
-        // Buscar compañero discípulo
+     
         Mago* companero = buscar_companero_discipulo(actual);
         
         if (companero && !companero->is_dead && 
@@ -209,24 +232,19 @@ Mago* ArbolMagico::encontrar_sucesor(Mago* actual) const {
             return companero;
         }
         
-        // Si el compañero tiene discípulos que cumplan las condiciones
         if (companero) {
             Mago* discipulo_companero = buscar_discipulo_magia(companero, "elemental", "unique");
             if (!discipulo_companero) discipulo_companero = buscar_discipulo_mixed(companero);
             if (discipulo_companero) return discipulo_companero;
         }
         
-        // 3. Si el compañero no está vivo o no tiene hijos
         Mago* maestro = buscar_maestro(actual);
         if (maestro) {
             Mago* tio = buscar_companero_discipulo(maestro);
             if (tio) return tio;
         }
     }
-
-    // 4. Si el dueño tiene más de 70 años
     if (actual->age > 70) {
-        // Buscar discípulo con misma magia que el maestro
         Mago* discipulo_misma_magia = nullptr;
         Mago* discipulo_mayor_edad = nullptr;
         
@@ -252,39 +270,33 @@ Mago* ArbolMagico::encontrar_sucesor(Mago* actual) const {
         if (discipulo_mayor_edad) return discipulo_mayor_edad;
     }
 
-    // 5. Buscar mujer más joven con discípulos vivos y maestros mixed
     Mago* mejor_mujer_con_discipulos = nullptr;
     Mago* mejor_mujer = nullptr;
     
-    // Usamos recursión en lugar de stack
     encontrar_mejor_mujer_recursivo(raiz, mejor_mujer_con_discipulos, mejor_mujer, actual);
     
     if (mejor_mujer_con_discipulos) return mejor_mujer_con_discipulos;
     return mejor_mujer;
 }
 
-// Función auxiliar recursiva para encontrar la mejor mujer
 void ArbolMagico::encontrar_mejor_mujer_recursivo(Mago* nodo, Mago*& mejor_con_discipulos, 
                                                  Mago*& mejor_mujer, Mago* actual) const {
     if (!nodo) return;
     
-    // Procesar hijos primero
+    
     encontrar_mejor_mujer_recursivo(nodo->izquierdo, mejor_con_discipulos, mejor_mujer, actual);
     encontrar_mejor_mujer_recursivo(nodo->derecho, mejor_con_discipulos, mejor_mujer, actual);
     
-    // Verificar si es mujer viva y no es el dueño actual
+    
     if (!nodo->is_dead && nodo->gender == 'M' && nodo->id != actual->id) {
-        // Verificar si tiene discípulos vivos
+        
         bool tiene_discipulos_vivos = (nodo->izquierdo && !nodo->izquierdo->is_dead) || 
                                      (nodo->derecho && !nodo->derecho->is_dead);
         
-        // Verificar si sus maestros fueron poseedores del hechizo y tenían magia mixed
         bool maestro_cumple = false;
         Mago* maestro = buscar_maestro(nodo);
         if (maestro && maestro->type_magic == "mixed") {
-            // Verificar si el maestro fue poseedor del hechizo
-            // (asumimos que hay un historial de poseedores)
-            maestro_cumple = true; // Simplificación
+            maestro_cumple = true; 
         }
         
         if (tiene_discipulos_vivos && maestro_cumple) {
@@ -293,7 +305,6 @@ void ArbolMagico::encontrar_mejor_mujer_recursivo(Mago* nodo, Mago*& mejor_con_d
             }
         }
         
-        // Guardar la mujer más joven en general
         if (!mejor_mujer || nodo->age < mejor_mujer->age) {
             mejor_mujer = nodo;
         }
@@ -311,21 +322,28 @@ Mago* ArbolMagico::buscar_dueno_recursivo(Mago* nodo) const {
 void ArbolMagico::mostrar_linea_sucesion() const {
     Mago* dueno = buscar_dueno_recursivo(raiz);
     if (!dueno) {
-        cout << "No hay dueño actual del hechizo.\n";
+        cout << "No hay dueno actual del hechizo.\n";
         return;
     }
-    
-    cout << "\n=== LINEA DE SUCESION ACTUAL ===\n";
-    cout << "1. " << dueno->name << " " << dueno->last_name << " (Actual dueño)\n";
 
-    Mago* sucesor = encontrar_sucesor(dueno);
-    int pos = 2;
-    int ultimo_id = dueno->id;
-    
-    while (sucesor && sucesor->id != ultimo_id) {
-        cout << pos++ << ". " << sucesor->name << " " << sucesor->last_name << "\n";
-        ultimo_id = sucesor->id;
-        sucesor = encontrar_sucesor(sucesor);
+    cout << "\n=== LINEA DE SUCESION ACTUAL ===\n";
+    int pos = 1;
+    Mago* actual = dueno;
+    int ids_mostrados[100]; 
+    int ids_count = 0;
+    auto id_ya_mostrado = [&](int id) {
+        for (int i = 0; i < ids_count; ++i) {
+            if (ids_mostrados[i] == id) return true;
+        }
+        return false;
+    };
+    while (actual && !id_ya_mostrado(actual->id)) {
+        cout << pos << ". " << actual->name << " " << actual->last_name;
+        if (pos == 1) cout << " (Actual dueno)";
+        cout << "\n";
+        ids_mostrados[ids_count++] = actual->id;
+        actual = encontrar_sucesor(actual);
+        ++pos;
     }
 }
 
@@ -387,9 +405,9 @@ void ArbolMagico::guardar_magos_recursivo(Mago* nodo, ofstream& archivo_m) const
              << nodo->gender << ","
              << nodo->age << ","
              << nodo->id_father << ","
-             << (nodo->is_dead ? "1" : "0") << ","
+             << (nodo->is_dead ? "1 si" : "0 no") << ","
              << nodo->type_magic << ","
-             << (nodo->is_owner ? "1" : "0") << "\n";
+             << (nodo->is_owner ? "1 si " : "0 no ") << "\n";
 
     guardar_magos_recursivo(nodo->derecho, archivo_m);
 }
@@ -406,14 +424,21 @@ void ArbolMagico::mostrar_arbol_genealogico() const {
 
 void ArbolMagico::mostrar_arbol_genealogico_rec(Mago* nodo, int nivel) const {
     if (!nodo) return;
-    
-    for (int i = 0; i < nivel; ++i) cout << "    ";
+    static const char* branch[] = {"", "├── ", "└── ", "│   ", "    "};
+    static string prefix = "";
+    cout << prefix;
+    cout << (nivel == 0 ? "" : (nodo->derecho ? branch[1] : branch[2]));
     cout << nodo->name << " " << nodo->last_name << " (ID:" << nodo->id;
     if (nodo->is_owner) cout << ", DUENO";
     cout << ")" << endl;
-    
+
+    string old_prefix = prefix;
+    if (nivel > 0) {
+        prefix += (nodo->derecho ? branch[3] : branch[4]);
+    }
     mostrar_arbol_genealogico_rec(nodo->izquierdo, nivel + 1);
-    mostrar_arbol_genealogico_rec(nodo->derecho, nivel);
+    prefix = old_prefix;
+    mostrar_arbol_genealogico_rec(nodo->derecho, nivel + 1);
 }
 
 void ArbolMagico::mostrar_arbol_rec(Mago* nodo, int nivel) const {
@@ -688,4 +713,8 @@ void ArbolMagico::agregar_hechizo(int id_mago, const hechizo& nuevo_hechizo) {
 
 Mago* ArbolMagico::obtener_dueno_actual() const {
     return buscar_dueno_recursivo(raiz);
+}
+
+Mago* ArbolMagico::obtener_raiz() const {
+    return raiz;
 }

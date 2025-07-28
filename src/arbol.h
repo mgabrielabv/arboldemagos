@@ -1,5 +1,7 @@
 #ifndef ARBOL_H
 #define ARBOL_H
+#define MAX_HIJOS 100  
+#define MAX_HECHIZOS 100
 
 #include <fstream>
 #include <string>
@@ -61,6 +63,7 @@ public:
     static void liberar_arbol(Mago* nodo);
     Mago* get_raiz() const { return raiz; }
     Mago* obtener_dueno_actual() const;
+    Mago* obtener_raiz() const;
     
 private:
     Mago* raiz;
@@ -83,6 +86,9 @@ private:
     Mago* buscar_maestro(Mago* discipulo) const;
     Mago* encontrar_sucesor(Mago* actual) const;
     Mago* buscar_dueno_recursivo(Mago* nodo) const;
+    Mago* buscar_discipulo_magia_por_padre(Mago* nodo, int id_padre, const string& magia1, const string& magia2) const;
+    Mago* buscar_discipulo_mixed_por_padre(Mago* nodo, int id_padre) const;
+    Mago* buscar_primer_hombre_vivo_por_padre(Mago* nodo, int id_padre) const;
     
     void mostrar_arbol_rec(Mago* nodo, int nivel) const;
     void mostrar_arbol_genealogico_rec(Mago* nodo, int nivel) const;
