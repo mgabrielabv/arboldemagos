@@ -1,42 +1,12 @@
 id,name,last_name,gender,age,id_father,is_dead,type_magic,is_owner
-1,Merlin,Gales,H,96,0,1,unique,0
-2,Morgana,Derdes,M,94,1,0,elemental,1
-3,Radleigh,Radleigh,H,68,1,0,elemental,0
-4,Haylock,Haylock,M,66,2,0,mixed,0
-5,Vernham,Vernham,M,37,2,0,mixed,0
-6,Joiner,Joiner ,M,61,3,1,elemental,0
-7,Fieldgate,Fieldgate,M,46,3,0,mixed,0
-8,Borrington,Borrington,H,76,4,0,unique,0
-9,Vigours,Vigours,H,72,4,0,elemental,0
-10,Paolone,Paolone,M,87,5,0,elemental,0
-11,Casacchia,Casacchia,M,37,5,0,unique,0
-12,Robathon,Robathon,M,94,6,0,unique,0
-13,Seyfart,Seyfart,M,8,6,0,no_magic,0
-14,Fincken,Fincken,H,21,7,0,elemental,0
-15,Aldersea,Aldersea,M,80,7,0,no_magic,0
-16,Toye,toye,M,1,8,0,elemental,0
-17,Wanne,Wanne,H,51,8,0,no_magic,0
-18,Embleton,Embleton,H,1,9,0,unique,0
-19,Crinkley,Crinkley,M,1,9,0,no_magic,0
-20,Rosewall,Rosewall,H,1,10,0,no_magic,0
-21,MacScherie,MacScherie,H,19,10,0,no_magic,0
-22,Elner,Elner,M,1,11,0,elemental,0
-23,Hutsby,Hutsby,M,12,11,0,unique,0
-24,Stigers,Stigers,H,14,12,0,elemental,0
-25,Rominov,Rominov,H,1,12,0,unique,0
-26,Faucherand,Faucherand,M,1,13,0,no_magic,0
-27,Stearndale,Stearndale,H,1,13,0,mixed,0
-28,Hove,Hove,M,1,14,0,unique,0
-29,Barber,Barber,M,1,14,0,elemental,0
-30,Somers,Somers,H,1,15,0,unique,0
-31,Wittleton,Wittleton,H,1,15,0,no_magic,0
-32,Risman,Risman,M,1,16,0,elemental,0
-33,Lachaize,Lachaize,H,1,16,0,elemental,0
-34,Jamblin,Jamblin,M,1,17,0,mixed,0
-35,Millar,Millar,M,1,17,0,elemental,0
-36,Scallon,Scallon,M,1,18,0,elemental,0
-37,Durrad,Durrad,M,1,18,0,no_magic,0
-38,Naisbit,Naisbit,M,1,19,0,elemental,0
-39,Lainge,Lainge,M,1,19,0,unique,0
-40,Klimkin,Klimkin,H,1,20,0,mixed,0
-
+1,marlon,galo,M,43,0,0 no,unique,0 no 
+2,Morgana,LeFay,M,94,1,1 si,elemental,0 no 
+3,Radleigh,Smith,H,68,1,0 no,elemental,0 no 
+4,Haylock,Granger,M,66,2,0 no,mixed,1 si 
+5,Vernham,Dumbledore,M,37,2,0 no,mixed,0 no 
+6,Joiner,Weasley,M,61,3,1 si,elemental,0 no 
+7,Fieldgate,Potter,M,46,3,0 no,mixed,0 no 
+8,Borrington,Riddle,H,76,4,0 no,unique,0 no 
+9,Vigours,Snape,H,72,4,0 no,elemental,0 no 
+10,Paolone,Lovegood,M,87,5,0 no,elemental,0 no 
+11,Casacchia,Longbottom,M,37,5,0 no,unique,0 no 

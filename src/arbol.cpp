@@ -44,42 +44,54 @@ Mago* ArbolMagico::buscar_primer_hombre_vivo_por_padre(Mago* nodo, int id_padre)
 
 Mago* ArbolMagico::crear_mago_desde_linea(const string& linea) {
     Mago* nuevo = new Mago();
-    size_t pos = 0;
-    size_t start = 0;
-    int campo = 0;
     string tokens[9];
-    
-    while((pos = linea.find(',', start)) != string::npos || start < linea.size()) {
-        string token;
-        if (pos != string::npos) {
-            token = linea.substr(start, pos - start);
-            start = pos + 1;
-        } else {
-            token = linea.substr(start);
-            start = linea.size();
-        }
-        if (campo < 9) tokens[campo] = token;
-        campo++;
-    }
-  
+    int campo = 0;
+    size_t start = 0;
+    size_t end = linea.find(',');
+
     try {
-        nuevo->id = stoi(tokens[0]); 
-        nuevo->name = tokens[1]; 
+        
+        while (campo < 9 && start != string::npos) {
+            end = linea.find(',', start);
+            string token;
+            
+            if (end == string::npos) {
+                token = linea.substr(start);
+            } else {
+                token = linea.substr(start, end - start);
+            }
+
+            
+            token.erase(0, token.find_first_not_of(" \t"));
+            token.erase(token.find_last_not_of(" \t") + 1);
+
+            tokens[campo++] = token;
+            start = (end == string::npos) ? end : end + 1;
+        }
+
+      
+        if (campo != 9) {
+            throw runtime_error("La línea no tiene 9 campos: " + linea);
+        }
+
+        
+        nuevo->id = tokens[0].empty() ? 0 : stoi(tokens[0]);
+        nuevo->name = tokens[1];
         nuevo->last_name = tokens[2];
-        nuevo->gender = tokens[3][0]; 
-        nuevo->age = stoi(tokens[4]); 
-        nuevo->id_father = stoi(tokens[5]); 
-        nuevo->is_dead = (tokens[6] == "1");
-        nuevo->type_magic = tokens[7]; 
-        nuevo->is_owner = (tokens[8] == "1"); 
+        nuevo->gender = tokens[3].empty() ? ' ' : tokens[3][0];
+        nuevo->age = tokens[4].empty() ? 0 : stoi(tokens[4]);
+        nuevo->id_father = tokens[5].empty() ? 0 : stoi(tokens[5]);
+        nuevo->is_dead = (tokens[6] == "1" || tokens[6] == "1 si");
+        nuevo->type_magic = tokens[7];
+        nuevo->is_owner = (tokens[8] == "1" || tokens[8] == "1 si");
+
     } catch (...) {
         delete nuevo;
-        throw runtime_error("Error parsing magician data");
+        throw runtime_error("Error al parsear línea: " + linea);
     }
-    
+
     return nuevo;
 }
-
 void ArbolMagico::liberar_arbol(Mago* nodo) {
     if (nodo) {
         liberar_arbol(nodo->izquierdo);
