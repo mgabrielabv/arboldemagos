@@ -16,7 +16,7 @@ Si todo lo anterior falla, busca entre hermanos de aprendizaje, discípulos de e
 
 Esto evita que los hechizos queden sin dueño y reduce las peleas por el poder.
 
-Qué puedes hacer con el programa
+Qué puedes hacer con el programa?
 Ver el árbol completo: Tanto en su forma genealógica como ordenado por edades.
 
 Explorar la línea de sucesión: Saber quién heredaría los hechizos y en qué orden.
@@ -26,3 +26,5 @@ Gestionar hechizos: Consultar los que tiene un mago o agregar nuevos.
 Modificar magos: Cambiar sus datos, simular su muerte o transferir sus hechizos.
 
 Ver al dueño actual: Saber quién controla los hechizos en este momento.
+
+estudiantes: Maria Bermudez y Miguel Castillo
